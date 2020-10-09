@@ -48,6 +48,8 @@ public class RollingChecksum {
 	 */
 	private RandomAccessFile diffraf;
 
+	private long current_weakChecksum=0;
+
 	public RollingChecksum() {
 	}
 
@@ -65,7 +67,7 @@ public class RollingChecksum {
 	/**
 	 * 文件info 组装成map
 	 * 
-	 * @param srcFile
+	 * @param
 	 * @return
 	 */
 	private Map<Long, BlockChecksums> converte2Map() {
@@ -120,18 +122,24 @@ public class RollingChecksum {
 	 * 滚动对比
 	 * 
 	 * @param srcMap
-	 * @param blk
+	 * @param
 	 * @return
 	 */
 	private int checkBlk(Map<Long, BlockChecksums> srcMap, int offset, List<DiffCheckItem> difList) {
 		int start = offset;
 		BlockChecksums bck = null; // 新老文件相同的块，老文件的
 		BlockChecksums blk = null; // 新文件取出的块
+		BlockChecksums lastblk = null;
 		for (; start < updateFile.length(); start++) {
-			blk = getNextBlock(start);
+
+			blk = getNextBlock(start,lastblk);
+
+			lastblk = blk;
 			if (srcMap.containsKey(blk.getWeakChecksum())) {
 				bck = srcMap.get(blk.getWeakChecksum());
+				blk.getStrongChecksum();
 				if (bck.getHexStrongChecksum().equals(blk.getHexStrongChecksum())) {
+					current_weakChecksum = 0;
 					break;
 				}
 			}
@@ -183,7 +191,7 @@ public class RollingChecksum {
 	 * @param offset
 	 * @return BlockChecksums
 	 */
-	private BlockChecksums getNextBlock(int offset) {
+	private BlockChecksums getNextBlock(int offset,BlockChecksums lastblk) {
 		byte[] buf = new byte[Constants.BLOCK_SIZE];
 		try {
 			if (raf == null) {
@@ -191,8 +199,19 @@ public class RollingChecksum {
 			}
 			raf.seek(offset);
 			int re = raf.read(buf, 0, Constants.BLOCK_SIZE);
-			BlockChecksums blk = new BlockChecksums(buf, offset, re);
-			return blk;
+
+			if(current_weakChecksum == 0) {
+				BlockChecksums blk = new BlockChecksums(buf, offset, re);
+				current_weakChecksum = blk.getWeakChecksum();
+				return blk;
+			}else{
+				byte c1 = lastblk.getDataPtr()[0];
+				byte c2 = buf[re-1];
+				BlockChecksums blk = new BlockChecksums(buf, (int)current_weakChecksum,offset, re,c1,c2);
+				current_weakChecksum = blk.getWeakChecksum();
+				return blk;
+			}
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

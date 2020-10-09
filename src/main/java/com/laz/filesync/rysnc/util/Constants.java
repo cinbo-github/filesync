@@ -4,7 +4,7 @@ public  class Constants {
 	/**
 	 * 分块大小
 	 */
-	public static  int BLOCK_SIZE = 1024*5;
+	public static  int BLOCK_SIZE = 1024*2;
 	public static final String MD5 = "MD5";
 	
 	public static int getBLOCK_SIZE() {
