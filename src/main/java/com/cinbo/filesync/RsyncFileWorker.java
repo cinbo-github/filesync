@@ -1,15 +1,11 @@
 package com.cinbo.filesync;
 
 import com.cinbo.filesync.entity.RsyncBlockCheckSum;
-
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -20,48 +16,50 @@ import java.util.Map;
 /**
  *
  */
-public class TestMainClass {
+public class RsyncFileWorker {
 
 
-    public static int BLOCKSIZE =1024*1024*16;
-    public static RandomAccessFile srcFile;
-    public static RandomAccessFile outputFile;
+    private static int BLOCKSIZE =1024*1024*16;
+    private static RandomAccessFile srcFile;
+    private static RandomAccessFile outputFile;
 
-    public static int remainder=0;
-    public static int offsetInside=0;
-    public static MessageDigest messageDigest;
+    private static int remainder=0;
+    private static int offsetInside=0;
+    private static MessageDigest messageDigest;
 
-    public static byte[] header = null;
+    private static byte[] header = null;
 
     /**
      * 这个标志非常重要，匹配的时候，一旦有差异就需要设置false;
      * 当匹配到下一个匹配的时候，如果mathflag是false，就需要把之前的数据都写入到文件。
      */
-    public static boolean matchFlag=true;
-    public static int diffBytes=0;
+    private static boolean matchFlag=true;
+    private static int diffBytes=0;
 
     /**
      * 专门用于写入差异数据长度的位置
      */
-    public static long diffBytesOffset=0;
+    private static long diffBytesOffset=0;
 
 
-    public static boolean fileMismatchFlag=false;
+    private static boolean fileMismatchFlag=false;
 
 
-    public static int numberMatch=0;
+    private static int numberMatch=0;
 
 
-    public static int totalfilelength=0;
+    private static int totalfilelength=0;
 
 
-    public static String srcFilePath="f:\\temp\\b.xls";
-    public static String destFilePath="f:\\temp\\a.xls";
 
-    public static String afterSyncFile = "f:\\temp\\aftersync.data.xls";
-    public static String syncDataFile = "f:\\temp\\rsync.data";
+    private static String srcFilePath="f:\\temp\\b.xls";
+    private static String destFilePath="f:\\temp\\a.xls";
 
-    public static void main(String[] args) throws Exception{
+    private static String afterSyncFile = "f:\\temp\\aftersync.data.xls";
+    private static String syncDataFile = "f:\\temp\\rsync.data";
+
+
+    public static void myfunc() throws Exception{
 
         byte[] buff = new byte[RsyncConstants.BLKSIZE];
 
@@ -235,7 +233,7 @@ public class TestMainClass {
     }
 
     private static void combineDeltaDataInto(List<RsyncBlockCheckSum> destSrcChecksums) throws Exception{
-        RandomAccessFile syncDataFile = new RandomAccessFile(TestMainClass.syncDataFile, "r");
+        RandomAccessFile syncDataFile = new RandomAccessFile(RsyncFileWorker.syncDataFile, "r");
         RandomAccessFile destDataFile = new RandomAccessFile(destFilePath, "r");
         if(new File(afterSyncFile).exists()){
             new File(afterSyncFile).delete();

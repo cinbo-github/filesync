@@ -27,10 +27,10 @@ public class TestSync {
 	@Test
 	public void testRolling() throws Exception {
 
-		File srcFile = new File("d:\\tmp\\a.pptx");
-		File updateFile = new File("d:\\tmp\\b.pptx");
-		File tmp = new File("D:\\tmp\\1.txt_tmp");
-		File newFile = new File("D:\\tmp\\1.txt_new");
+		File srcFile = new File("f:\\temp\\a.xls");
+		File updateFile = new File("f:\\temp\\b.xls");
+		File tmp = new File("f:\\temp\\1.txt_tmp");
+		File newFile = new File("f:\\temp\\1.txt_new");
 		long t1 = System.currentTimeMillis();
 		if (!tmp.exists()) {
 			tmp.createNewFile();
