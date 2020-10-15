@@ -17,7 +17,7 @@ public class FileSendClientHandler extends ChannelInboundHandlerAdapter {
 	}
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		File file = new File("d:/word/word.zip");
+		File file = new File("D:\\tmp\\sortfilein1");
 		writeAndFlushFileRegion(ctx, file);
 	}
 	

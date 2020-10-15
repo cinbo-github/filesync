@@ -1,5 +1,6 @@
 package com.laz.filesync.client.file.handler;
 
+import com.laz.filesync.client.msg.DiffFilesSyncMsg;
 import org.apache.log4j.Logger;
 
 import com.laz.filesync.server.msg.FileInfo;
@@ -27,7 +28,10 @@ public class MessageEncoder extends MessageToByteEncoder<Object> {
 			out.writeInt(fileNames.length);
 			out.writeBytes(fileNames);
 			out.writeLong(info.getLength());
-		} else {
+		} else if(msg instanceof DiffFilesSyncMsg){
+			System.out.println(((DiffFilesSyncMsg) msg).getFileDigest());
+		}
+		else{
 			logger.error("无法识别的消息类型"+msg);
 		}
 	}

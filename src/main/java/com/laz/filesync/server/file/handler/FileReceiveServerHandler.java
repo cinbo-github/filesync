@@ -20,6 +20,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class FileReceiveServerHandler extends ChannelInboundHandlerAdapter {
 	private static Logger logger = LoggerFactory.getLogger(FileReceiveServerHandler.class);
 	private long start;
+	private RandomAccessFile randomAccessFile=null;
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		super.channelActive(ctx);
@@ -45,18 +46,18 @@ public class FileReceiveServerHandler extends ChannelInboundHandlerAdapter {
 			logger.error("无法获取同步包文件名"+fileName);
 			return ;
 		}
-		File file = FileSyncUtil.getServerTempFile(fileName);
-		RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
-		randomAccessFile.seek(start);// 移动文件记录指针的位置,
+		if(randomAccessFile == null) {
+			File file = new File("d:\\tmp\\tmp\\" + fileName);
+			randomAccessFile = new RandomAccessFile(file, "rw");
+		}
 		int length = byteBuf.readableBytes();
-		start += length;
 		byte[] bytes = new byte[length];
 		byteBuf.readBytes(bytes);
 		randomAccessFile.write(bytes);// 调用了seek（start）方法，是指把文件的记录指针定位到start字节的位置。也就是说程序将从start字节开始写数据
 		byteBuf.release();
-		randomAccessFile.close();
 		if (start>=fileLen) {
-			logger.info(file.getAbsolutePath()+"文件接收完成");
+			logger.info("文件接收完成");
+			File file = new File("d:\\tmp\\tmp\\" + fileName);
 			String digest = Coder.encryptBASE64(FileSyncUtil.generateFileDigest(file));
 			FileUtil.countDown(digest);
 			ctx.close();
@@ -68,6 +69,7 @@ public class FileReceiveServerHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		super.channelInactive(ctx);
+		randomAccessFile.close();
 		System.out.println("----------------channelInactive-------------");
 	}
 }

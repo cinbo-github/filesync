@@ -51,4 +51,8 @@ public class TestFileService {
             e.printStackTrace();
         }
     }
+
+    public static void main(String[] args) {
+        new TestFileService(8990).start();
+    }
 }
