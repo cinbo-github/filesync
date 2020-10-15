@@ -47,3 +47,4 @@ mainframer
 # exclude vscode files
 .vscode/
 *.factorypath
+logs/
