@@ -58,9 +58,10 @@ public class FileServerHandler extends SimpleChannelInboundHandler<String> {
 
         //ctx.write("OK: " + raf.length() + '\n');
         ByteBuf fileLengthBytebuff= ctx.alloc().buffer(4);
-        fileLengthBytebuff.writeInt((int)length);
+        fileLengthBytebuff.writeLong(length);
         ctx.write(fileLengthBytebuff);
-        ctx.writeAndFlush(new DefaultFileRegion(raf.getChannel(), 0, length));
+        ctx.writeAndFlush(new ChunkedFile(raf));
+        //ctx.writeAndFlush(new DefaultFileRegion(raf.getChannel(), 0, length));
 //        if (ctx.pipeline().get(SslHandler.class) == null) {
 //            // SSL not enabled - can use zero-copy file transfer.
 //            ctx.writeAndFlush(new DefaultFileRegion(raf.getChannel(), 0, length));
@@ -68,7 +69,7 @@ public class FileServerHandler extends SimpleChannelInboundHandler<String> {
 //            // SSL enabled - cannot use zero-copy file transfer.
 //            ctx.write(new ChunkedFile(raf));
 //        }
-        ctx.writeAndFlush("\n");
+        //ctx.writeAndFlush("\n");
     }
 
     @Override

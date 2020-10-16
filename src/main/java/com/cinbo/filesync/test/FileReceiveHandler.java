@@ -20,8 +20,8 @@ import java.io.RandomAccessFile;
 public class FileReceiveHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private boolean isStart=true;
-    private int fileLength = 0;
-    private int totoalbytes=0;
+    private long fileLength = 0;
+    private long totoalbytes=0;
     private OutputStream of ;
     public FileReceiveHandler(){
     }
@@ -39,10 +39,10 @@ public class FileReceiveHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
         if(isStart){
-            if(msg.readableBytes()<4){
+            if(msg.readableBytes()<8){
                 return;
             }else{
-                fileLength = msg.readInt();
+                fileLength = msg.readLong();
                 System.out.println("file size:"+fileLength);
                 isStart = false;
             }
@@ -53,7 +53,8 @@ public class FileReceiveHandler extends SimpleChannelInboundHandler<ByteBuf> {
         of.write(tempbuf);
         System.out.println(totoalbytes);
         if(totoalbytes>=fileLength){
-            System.out.println("接收完成");
+            System.out.println("接收完成. 文件大小："+totoalbytes);
+            of.close();
             File file = new File("d:\\tmp\\sortfilein1_1");
             System.out.println(Coder.encryptBASE64(FileSyncUtil.generateFileDigest(file)));
             of.close();
